@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Влад — репетитор по математике</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B2545;
+    --blue:#0A6CFF;
+    --blue-deep:#084FCB;
+    --sky:#EAF2FF;
+    --sky-2:#F5F9FF;
+    --white:#FFFFFF;
+    --ink:#0F2540;
+    --slate:#5C7290;
+    --line:#DCE7F7;
+    --radius:20px;
+    --maxw:1160px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color:var(--ink);
+    background:var(--white);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3, .eyebrow, .brand, .stat-num{
+    font-family:"Manrope", -apple-system, sans-serif;
+  }
+  .mono{
+    font-family:"JetBrains Mono", ui-monospace, monospace;
+  }
+  a{color:inherit; text-decoration:none;}
+  img{display:block; max-width:100%;}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px;}
+  section{position:relative;}
+
+  /* ---------- Progress curve (signature element) ---------- */
+  #curve-rail{
+    position:fixed;
+    left:0; top:0;
+    width:64px; height:100vh;
+    z-index:5;
+    pointer-events:none;
+    display:none;
+  }
+  #curve-rail svg{width:100%; height:100%;}
+  #curve-path{
+    fill:none;
+    stroke:var(--sky);
+    stroke-width:2.5;
+  }
+  #curve-progress{
+    fill:none;
+    stroke:var(--blue);
+    stroke-width:2.5;
+    stroke-dasharray:2000;
+    stroke-dashoffset:2000;
+    transition:stroke-dashoffset .05s linear;
+  }
+  #curve-dot{
+    fill:var(--blue);
+    r:5;
+  }
+  @media (min-width:1000px){ #curve-rail{display:block;} }
+
+  /* ---------- Nav ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(255,255,255,.78);
+    backdrop-filter:saturate(180%) blur(16px);
+    -webkit-backdrop-filter:saturate(180%) blur(16px);
+    border-bottom:1px solid var(--line);
+  }
+  nav.wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    height:64px;
+  }
+  .brand{
+    font-weight:800; font-size:18px; letter-spacing:-.02em;
+    display:flex; align-items:center; gap:8px;
+  }
+  .brand .mark{
+    width:26px; height:26px; border-radius:8px;
+    background:linear-gradient(135deg, var(--blue), var(--navy));
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-family:"JetBrains Mono"; font-size:13px; font-weight:700;
+  }
+  .navlinks{display:flex; align-items:center; gap:28px;}
+  .navlinks a{
+    font-size:14.5px; color:var(--slate); font-weight:500;
+    transition:color .15s ease;
+  }
+  .navlinks a:hover{color:var(--navy);}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:11px 22px;
+    border-radius:100px;
+    font-size:14.5px; font-weight:700;
+    cursor:pointer; border:none;
+    transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+    white-space:nowrap;
+  }
+  .btn-primary{
+    background:var(--blue); color:#fff;
+    box-shadow:0 8px 20px -6px rgba(10,108,255,.55);
+  }
+  .btn-primary:hover{background:var(--blue-deep); transform:translateY(-1px);}
+  .btn-ghost{
+    background:var(--sky); color:var(--navy);
+  }
+  .btn-ghost:hover{background:#DCEBFF; transform:translateY(-1px);}
+  .btn-outline{
+    background:transparent; color:var(--navy); border:1.5px solid var(--line);
+  }
+  .btn-outline:hover{border-color:var(--blue); color:var(--blue);}
+  .nav-cta{display:none;}
+  @media (min-width:760px){ .nav-cta{display:inline-flex;} }
+  .navlinks{display:none;}
+  @media (min-width:900px){ .navlinks{display:flex;} }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background:radial-gradient(120% 100% at 100% 0%, #12305E 0%, var(--navy) 45%, #081B36 100%);
+    color:#fff;
+    padding:72px 0 96px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero .glyphs{
+    position:absolute; inset:0; z-index:0; opacity:.14;
+    font-family:"JetBrains Mono"; font-weight:700;
+    pointer-events:none;
+  }
+  .hero .glyphs span{position:absolute; color:#8FB6FF;}
+  .hero-grid{
+    position:relative; z-index:2;
+    display:grid; grid-template-columns:1fr; gap:48px;
+    align-items:center;
+  }
+  @media (min-width:960px){
+    .hero-grid{grid-template-columns:1.05fr .95fr; gap:40px;}
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:13px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    color:#9FC2FF;
+    background:rgba(143,182,255,.12);
+    border:1px solid rgba(143,182,255,.28);
+    padding:7px 14px; border-radius:100px;
+    margin-bottom:22px;
+  }
+  .eyebrow .dot{width:6px; height:6px; border-radius:50%; background:#4FD1C5;}
+  .hero h1{
+    font-size:clamp(34px, 5.2vw, 56px);
+    font-weight:800; letter-spacing:-.03em; line-height:1.06;
+    margin-bottom:20px;
+  }
+  .hero h1 em{
+    font-style:normal;
+    background:linear-gradient(90deg, #8FB6FF, #E7F0FF);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hero p.sub{
+    font-size:18px; line-height:1.55; color:#C4D6F5;
+    max-width:520px; margin-bottom:34px;
+  }
+  .hero-actions{display:flex; flex-wrap:wrap; gap:14px; margin-bottom:44px;}
+  .hero-actions .btn-primary{padding:15px 26px; font-size:15.5px;}
+  .hero-actions .btn-outline{
+    border-color:rgba(255,255,255,.28); color:#fff;
+  }
+  .hero-actions .btn-outline:hover{border-color:#fff; color:#fff; background:rgba(255,255,255,.06);}
+
+  .stat-row{display:flex; flex-wrap:wrap; gap:28px;}
+  .stat{display:flex; align-items:center; gap:12px;}
+  .stat-chip{
+    width:52px; height:52px; border-radius:14px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.14);
+    display:flex; align-items:center; justify-content:center;
+    font-family:"JetBrains Mono"; font-weight:700; font-size:14px;
+    color:#fff;
+  }
+  .stat-label{font-size:13px; color:#9FB4DA; line-height:1.3; max-width:110px;}
+
+  .hero-photo-wrap{
+    position:relative;
+    display:flex; justify-content:center;
+  }
+  .photo-frame{
+    position:relative;
+    width:min(360px, 84vw);
+    border-radius:28px;
+    padding:8px;
+    background:linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.18);
+  }
+  .photo-frame img{
+    width:100%; aspect-ratio:2/3; object-fit:cover;
+    border-radius:22px;
+    display:block;
+  }
+  .photo-badge{
+    position:absolute; bottom:-16px; left:-16px;
+    background:#fff; color:var(--navy);
+    border-radius:16px;
+    padding:12px 16px;
+    box-shadow:0 14px 30px -10px rgba(0,0,0,.35);
+    display:flex; align-items:center; gap:10px;
+  }
+  .photo-badge .num{
+    font-family:"JetBrains Mono"; font-weight:800; font-size:20px; color:var(--blue);
+  }
+  .photo-badge .txt{font-size:11.5px; color:var(--slate); line-height:1.25; max-width:110px;}
+  .curve-underlay{
+    position:absolute; right:-40px; top:20%;
+    width:280px; opacity:.5; z-index:0;
+  }
+
+  /* ---------- Section shells ---------- */
+  .section-head{
+    max-width:640px; margin-bottom:44px;
+  }
+  .section-head .eyebrow-plain{
+    font-size:13px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--blue); margin-bottom:12px; display:block;
+  }
+  .section-head h2{
+    font-size:clamp(26px, 3.4vw, 36px);
+    font-weight:800; letter-spacing:-.02em; line-height:1.14;
+    color:var(--navy);
+    margin-bottom:14px;
+  }
+  .section-head p{
+    font-size:16.5px; color:var(--slate); line-height:1.6;
+  }
+  .reveal{opacity:0; transform:translateY(22px); transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  /* ---------- About ---------- */
+  #about{padding:100px 0; background:var(--white);}
+  .about-grid{
+    display:grid; grid-template-columns:1fr; gap:40px;
+  }
+  @media (min-width:900px){
+    .about-grid{grid-template-columns:1.1fr .9fr; gap:56px; align-items:start;}
+  }
+  .about-text{
+    border-radius:var(--radius);
+    padding:32px;
+    background:var(--sky-2);
+    border:1px solid var(--line);
+  }
+  .about-text .ph-label{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+    color:var(--blue); margin-bottom:16px;
+  }
+  .about-text p{
+    color:var(--ink); font-size:16px; line-height:1.7;
+  }
+  .about-text p + p{margin-top:16px;}
+  .diploma-frame{
+    border-radius:var(--radius);
+    background:var(--sky-2);
+    border:1px solid var(--line);
+    padding:12px;
+    cursor:pointer;
+  }
+  .diploma-frame img{
+    width:100%;
+    border-radius:12px;
+    display:block;
+    box-shadow:0 18px 40px -20px rgba(10,37,69,.35);
+    transition:transform .2s ease;
+  }
+  .diploma-frame:hover img{transform:scale(1.015);}
+  .diploma-caption{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin-top:14px; font-size:13px; color:var(--slate); font-weight:600;
+  }
+  .diploma-caption::before{content:"🔍"; font-size:13px;}
+
+  /* ---------- Services ---------- */
+  #services{padding:100px 0; background:var(--sky-2);}
+  .services-grid{
+    display:grid; grid-template-columns:1fr; gap:20px;
+  }
+  @media (min-width:700px){ .services-grid{grid-template-columns:1fr 1fr;} }
+  .service-card{
+    background:#fff; border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:32px;
+    transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  .service-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 22px 40px -18px rgba(10,37,69,.18);
+    border-color:transparent;
+  }
+  .service-glyph{
+    width:52px; height:52px; border-radius:14px;
+    background:var(--sky);
+    display:flex; align-items:center; justify-content:center;
+    font-family:"JetBrains Mono"; font-weight:700; font-size:20px; color:var(--blue);
+    margin-bottom:20px;
+  }
+  .service-card h3{
+    font-size:19px; font-weight:800; color:var(--navy); margin-bottom:10px; letter-spacing:-.01em;
+  }
+  .service-card p{color:var(--slate); font-size:15px; line-height:1.6;}
+
+  /* ---------- Price ---------- */
+  #price{padding:100px 0; background:var(--white);}
+  .price-card{
+    max-width:520px; margin:0 auto;
+    background:linear-gradient(150deg, var(--navy), #123763);
+    border-radius:28px;
+    padding:44px 40px;
+    color:#fff;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .price-card::before{
+    content:"";
+    position:absolute; inset:0;
+    background:radial-gradient(60% 60% at 100% 0%, rgba(143,182,255,.25), transparent 60%);
+  }
+  .price-card *{position:relative; z-index:1;}
+  .price-label{font-size:13px; letter-spacing:.05em; text-transform:uppercase; color:#9FC2FF; font-weight:700; margin-bottom:16px;}
+  .price-num{
+    font-family:"JetBrains Mono"; font-weight:800;
+    font-size:56px; line-height:1;
+    display:flex; align-items:baseline; justify-content:center; gap:8px;
+    margin-bottom:8px;
+  }
+  .price-num small{font-size:18px; font-weight:500; color:#C4D6F5;}
+  .price-note{color:#AEC6EC; font-size:14.5px; margin-bottom:30px;}
+  .price-perks{
+    display:flex; flex-direction:column; gap:10px; text-align:left;
+    margin:0 auto 32px; max-width:320px;
+  }
+  .price-perks li{
+    list-style:none; display:flex; gap:10px; align-items:flex-start;
+    font-size:14.5px; color:#DCE9FF;
+  }
+  .price-perks li::before{content:"✓"; color:#4FD1C5; font-weight:800;}
+
+  /* ---------- Quote ---------- */
+  #quote{padding:96px 0; background:var(--sky-2);}
+  .quote-box{
+    max-width:760px; margin:0 auto; text-align:center;
+  }
+  .quote-mark{
+    font-family:"Manrope"; font-size:64px; font-weight:800; color:var(--blue);
+    line-height:1; margin-bottom:8px;
+  }
+  .quote-box blockquote{
+    font-size:clamp(20px, 2.6vw, 28px); font-weight:700; letter-spacing:-.01em;
+    color:var(--navy); line-height:1.4; margin-bottom:22px;
+  }
+  .quote-box cite{
+    font-style:normal; color:var(--slate); font-size:14.5px; font-weight:600;
+  }
+
+  /* ---------- Reviews ---------- */
+  #reviews{padding:100px 0; background:var(--white);}
+  .reviews-grid{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:14px;
+  }
+  @media (min-width:640px){ .reviews-grid{grid-template-columns:repeat(3,1fr);} }
+  @media (min-width:960px){ .reviews-grid{grid-template-columns:repeat(4,1fr);} }
+  .review-tile{
+    aspect-ratio:3/4;
+    border-radius:16px;
+    background:var(--sky);
+    border:1px solid var(--line);
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .review-tile:hover{transform:translateY(-3px); box-shadow:0 16px 30px -14px rgba(10,37,69,.25);}
+  .review-tile img{
+    width:100%; height:100%; object-fit:cover; object-position:top center;
+  }
+  .review-tile .rtag{
+    position:absolute; left:10px; bottom:10px;
+    background:rgba(11,37,69,.72);
+    backdrop-filter:blur(4px);
+    color:#fff; font-size:11.5px; font-weight:700;
+    padding:5px 10px; border-radius:100px;
+    display:flex; align-items:center; gap:6px;
+  }
+
+  /* Lightbox modal */
+  .modal-backdrop{
+    position:fixed; inset:0; z-index:200;
+    background:rgba(8,20,40,.72);
+    backdrop-filter:blur(6px);
+    display:none;
+    align-items:center; justify-content:center;
+    padding:24px;
+  }
+  .modal-backdrop.open{display:flex;}
+  .modal-box{
+    background:#fff; border-radius:24px;
+    max-width:420px; width:100%;
+    padding:20px;
+    position:relative;
+  }
+  .modal-box .modal-img{
+    width:100%; max-height:70vh;
+    border-radius:16px;
+    background:var(--sky);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .modal-img img{
+    width:100%; max-height:70vh; object-fit:contain; display:block;
+  }
+  .modal-name{
+    text-align:center; margin-top:16px;
+    font-size:14.5px; font-weight:700; color:var(--navy);
+  }
+  .modal-name span{
+    display:block; font-size:12px; font-weight:600; color:var(--slate); margin-top:2px;
+  }
+  .modal-nav{display:flex; justify-content:space-between; align-items:center; margin-top:16px;}
+  .modal-close{
+    position:absolute; top:-14px; right:-14px;
+    width:36px; height:36px; border-radius:50%;
+    background:var(--navy); color:#fff; border:3px solid #fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; cursor:pointer;
+    box-shadow:0 8px 18px -6px rgba(0,0,0,.4);
+  }
+  .modal-arrow{
+    width:40px; height:40px; border-radius:50%;
+    background:var(--sky); color:var(--navy);
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; cursor:pointer; border:none;
+    transition:background .15s ease;
+  }
+  .modal-arrow:hover{background:#DCEBFF;}
+  .modal-count{font-size:13px; color:var(--slate); font-weight:600;}
+
+  /* ---------- Contacts ---------- */
+  #contacts{
+    padding:100px 0 110px;
+    background:radial-gradient(120% 100% at 0% 0%, #12305E 0%, var(--navy) 55%, #081B36 100%);
+    color:#fff;
+  }
+  #contacts .section-head h2{color:#fff;}
+  #contacts .section-head p{color:#B9CDEE;}
+  #contacts .section-head .eyebrow-plain{color:#8FB6FF;}
+  .contact-grid{
+    display:grid; grid-template-columns:1fr; gap:16px;
+  }
+  @media (min-width:760px){ .contact-grid{grid-template-columns:repeat(2,1fr);} }
+  .contact-card{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:18px;
+    padding:22px 24px;
+    display:flex; align-items:center; gap:16px;
+    transition:background .18s ease, transform .18s ease;
+  }
+  .contact-card:hover{background:rgba(255,255,255,.11); transform:translateY(-2px);}
+  .contact-icon{
+    width:44px; height:44px; border-radius:12px;
+    background:rgba(143,182,255,.16);
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; flex-shrink:0;
+  }
+  .contact-lines .l1{font-size:12.5px; color:#9FB4DA; margin-bottom:3px; font-weight:600; text-transform:uppercase; letter-spacing:.03em;}
+  .contact-lines .l2{font-size:15.5px; font-weight:700;}
+  .contacts-cta{
+    margin-top:40px; text-align:center;
+  }
+  .contacts-cta .btn-primary{padding:16px 34px; font-size:16px;}
+  .contacts-cta p{margin-top:14px; color:#9FB4DA; font-size:13.5px;}
+
+  footer{
+    background:#081B36; color:#7C93BE;
+    padding:26px 0; text-align:center; font-size:13px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    .reveal{transition:none; opacity:1; transform:none;}
+    #curve-progress{transition:none;}
+  }
+</style>
+</head>
+<body>
+
+<div id="curve-rail" aria-hidden="true">
+  <svg viewBox="0 0 64 800" preserveAspectRatio="none">
+    <path id="curve-path" d="M 46 0 C 10 120, 58 220, 20 340 C -6 430, 54 520, 24 640 C 8 700, 40 760, 30 800" />
+    <path id="curve-progress" d="M 46 0 C 10 120, 58 220, 20 340 C -6 430, 54 520, 24 640 C 8 700, 40 760, 30 800" />
+    <circle id="curve-dot" cx="46" cy="0"></circle>
+  </svg>
+</div>
+
+<header>
+  <nav class="wrap">
+    <div class="brand"><span class="mark">√x</span> Влад · Математика</div>
+    <div class="navlinks">
+      <a href="#about">Обо мне</a>
+      <a href="#services">Услуги</a>
+      <a href="#reviews">Отзывы</a>
+      <a href="#contacts">Контакты</a>
+    </div>
+    <a href="#contacts" class="btn btn-primary nav-cta">Записаться</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="glyphs" aria-hidden="true">
+    <span style="left:6%; top:14%; font-size:42px;">∫</span>
+    <span style="left:82%; top:8%; font-size:30px;">π</span>
+    <span style="left:88%; top:62%; font-size:46px;">Σ</span>
+    <span style="left:10%; top:72%; font-size:26px;">√</span>
+    <span style="left:48%; top:4%; font-size:22px;">∞</span>
+    <span style="left:60%; top:80%; font-size:30px;">Δ</span>
+  </div>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow"><span class="dot"></span> Приём учеников открыт</div>
+      <h1>Математика, которая <em>наконец понятна</em></h1>
+      <p class="sub">Готовлю школьников к ЕГЭ, ОГЭ и ВПР, разбираю пробелы и выстраиваю систему — без зубрёжки и лишней тревоги перед экзаменом.</p>
+      <div class="hero-actions">
+        <a href="#contacts" class="btn btn-primary">Бесплатное пробное занятие</a>
+        <a href="#reviews" class="btn btn-outline">Смотреть отзывы</a>
+      </div>
+      <div class="stat-row">
+        <div class="stat">
+          <div class="stat-chip">7</div>
+          <div class="stat-label">лет преподаю математику</div>
+        </div>
+        <div class="stat">
+          <div class="stat-chip">100+</div>
+          <div class="stat-label">учеников подготовлено</div>
+        </div>
+        <div class="stat">
+          <div class="stat-chip mono">1:1</div>
+          <div class="stat-label">индивидуальная программа под ученика</div>
+        </div>
+        <div class="stat">
+          <div class="stat-chip">✓</div>
+          <div class="stat-label">высокие результаты учеников</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-photo-wrap">
+      <svg class="curve-underlay" viewBox="0 0 200 300" aria-hidden="true">
+        <path d="M10 10 C 80 60, 20 140, 100 180 C 160 210, 120 260, 190 290" stroke="#4A7FD9" stroke-width="2" fill="none" opacity="0.5"/>
+      </svg>
+      <div class="photo-frame">
+        <img src="assets/tutor.jpg" alt="Влад — репетитор по математике">
+      </div>
+      <div class="photo-badge">
+        <div class="num">100</div>
+        <div class="txt">максимальный балл ЕГЭ — ориентир, к которому идём</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow-plain">Обо мне</span>
+      <h2>Преподаю так, чтобы математика перестала пугать</h2>
+      <p>Коротко о подходе и главной цели занятий.</p>
+    </div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <span class="ph-label">Обо мне</span>
+        <p>Меня зовут Влад, я репетитор по математике. На занятиях я объясняю сложные темы простым и понятным языком, поддерживаю дружескую атмосферу и помогаю ученикам не бояться ошибок.</p>
+        <p>Для меня важно, чтобы ученик не просто запоминал формулы, а действительно понимал материал и уверенно применял знания на практике. Главная цель наших занятий — реальный результат и уверенность в своих силах.</p>
+      </div>
+      <div class="diploma-frame reveal" id="diplomaOpen">
+        <img src="assets/diploma.jpg" alt="Диплом о профессиональной переподготовке — Байдин Владислав Владимирович, учитель математики">
+        <div class="diploma-caption">Открыть крупнее</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow-plain">Услуги</span>
+      <h2>Подготовка под конкретный результат</h2>
+      <p>Программа собирается под экзамен, класс и текущий уровень ученика — от базовой школьной программы до профильной математики.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-glyph">Е</div>
+        <h3>Подготовка к ЕГЭ</h3>
+        <p>Базовый и профильный уровень: от разбора первой части до сложных задач второй. Разбираем типовые ловушки и доводим решение до автоматизма.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-glyph">О</div>
+        <h3>Подготовка к ОГЭ</h3>
+        <p>Системная подготовка 9-классников: закрываем пробелы прошлых лет и нарабатываем уверенное решение всех типов заданий экзамена.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-glyph">В</div>
+        <h3>Подготовка к ВПР</h3>
+        <p>Разбор формата всероссийских проверочных работ, тренировка на реальных вариантах и снятие стресса перед контрольной точкой.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-glyph">↑</div>
+        <h3>Повышение успеваемости</h3>
+        <p>Помощь с текущей школьной программой: домашние задания, контрольные, четвертные и годовые оценки — без экзаменационной спешки.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="quote">
+  <div class="wrap">
+    <div class="quote-box reveal">
+      <div class="quote-mark">“</div>
+      <blockquote>Жизнь украшается двумя вещами: занятием математикой и&nbsp;её&nbsp;преподаванием.</blockquote>
+      <cite>— Симеон Дени Пуассон</cite>
+    </div>
+  </div>
+</section>
+
+<section id="reviews">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow-plain">Отзывы</span>
+      <h2>Что говорят ученики и родители</h2>
+      <p>Нажмите на карточку, чтобы открыть отзыв крупнее. Фотографии отзывов будут добавлены отдельно.</p>
+    </div>
+    <div class="reviews-grid" id="reviewsGrid">
+      <!-- tiles generated by JS from the reviews array -->
+    </div>
+  </div>
+</section>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose" aria-label="Закрыть">✕</button>
+    <div class="modal-img" id="modalImg">
+      <img id="modalImage" src="" alt="Отзыв">
+    </div>
+    <div class="modal-name" id="modalName">Наталья <span id="modalTag">WhatsApp</span></div>
+    <div class="modal-nav">
+      <button class="modal-arrow" id="modalPrev" aria-label="Предыдущий">←</button>
+      <span class="modal-count" id="modalCount">1 / 12</span>
+      <button class="modal-arrow" id="modalNext" aria-label="Следующий">→</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="diplomaBackdrop">
+  <div class="modal-box" style="max-width:640px;">
+    <button class="modal-close" id="diplomaClose" aria-label="Закрыть">✕</button>
+    <div class="modal-img">
+      <img src="assets/diploma.jpg" alt="Диплом о профессиональной переподготовке — Байдин Владислав Владимирович, учитель математики">
+    </div>
+    <div class="modal-name">Диплом о профессиональной переподготовке <span>Учитель (преподаватель) математики · АНО «НИИДПО»</span></div>
+  </div>
+</div>
+
+<section id="contacts">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow-plain">Контакты</span>
+      <h2>Готовы начать?</h2>
+      <p>Напишите или позвоните удобным способом — договоримся о бесплатном пробном занятии.</p>
+    </div>
+    <div class="contact-grid">
+      <a class="contact-card reveal" href="tel:+79185308717">
+        <div class="contact-icon">📞</div>
+        <div class="contact-lines"><div class="l1">Телефон</div><div class="l2">+7 918 530-87-17</div></div>
+      </a>
+      <a class="contact-card reveal" href="https://vk.ru/id757757528" target="_blank" rel="noopener">
+        <div class="contact-icon">VK</div>
+        <div class="contact-lines"><div class="l1">ВКонтакте</div><div class="l2">vk.ru/id757757528</div></div>
+      </a>
+      <a class="contact-card reveal" href="https://t.me/vlad_mathh" target="_blank" rel="noopener">
+        <div class="contact-icon">✈️</div>
+        <div class="contact-lines"><div class="l1">Telegram</div><div class="l2">@vlad_mathh</div></div>
+      </a>
+      <a class="contact-card reveal" href="mailto:vlad.math.pro@gmail.com">
+        <div class="contact-icon">✉️</div>
+        <div class="contact-lines"><div class="l1">Почта</div><div class="l2">vlad.math.pro@gmail.com</div></div>
+      </a>
+    </div>
+    <div class="contacts-cta reveal">
+      <a href="tel:+79185308717" class="btn btn-primary">Записаться на бесплатное занятие</a>
+      <p>Отвечаю обычно в течение дня</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Влад · Репетитор по математике · ЕГЭ · ОГЭ · ВПР
+</footer>
+
+<script>
+  // Review data — real screenshots from clients
+  const reviews = [
+    { name:'Наталья',          tag:'WhatsApp',  src:'assets/reviews/review-01.jpg' },
+    { name:'Ксения',           tag:'ВКонтакте', src:'assets/reviews/review-02.jpg' },
+    { name:'Из переписки',     tag:'WhatsApp',  src:'assets/reviews/review-03.jpg' },
+    { name:'Мама ученицы',     tag:'Telegram',  src:'assets/reviews/review-04.jpg' },
+    { name:'Гюнель',           tag:'Профи.ру',  src:'assets/reviews/review-05.jpg' },
+    { name:'Наталья',          tag:'Профи.ру',  src:'assets/reviews/review-06.jpg' },
+    { name:'Ирина',            tag:'Профи.ру',  src:'assets/reviews/review-07.jpg' },
+    { name:'Дина',             tag:'Профи.ру',  src:'assets/reviews/review-08.jpg' },
+    { name:'Мама Даши',        tag:'Telegram',  src:'assets/reviews/review-09.jpg' },
+    { name:'Мама Юмжаны',      tag:'Telegram',  src:'assets/reviews/review-10.jpg' },
+    { name:'Родители Володи',  tag:'Telegram',  src:'assets/reviews/review-11.jpg' },
+    { name:'Мама Германа',     tag:'Telegram',  src:'assets/reviews/review-12.jpg' },
+  ];
+  const total = reviews.length;
+
+  const reviewsGrid = document.getElementById('reviewsGrid');
+  reviews.forEach((r, i)=>{
+    const tile = document.createElement('div');
+    tile.className = 'review-tile reveal';
+    tile.dataset.index = i;
+    tile.innerHTML = `<img src="${r.src}" alt="Отзыв — ${r.name}" loading="lazy"><span class="rtag">${r.tag}</span>`;
+    reviewsGrid.appendChild(tile);
+  });
+  // Lightbox
+  const backdrop = document.getElementById('modalBackdrop');
+  const modalImage = document.getElementById('modalImage');
+  const modalName = document.getElementById('modalName');
+  const modalTag = document.getElementById('modalTag');
+  const modalCount = document.getElementById('modalCount');
+  let current = 0;
+
+  function openModal(idx){
+    current = idx;
+    updateModal();
+    backdrop.classList.add('open');
+  }
+  function updateModal(){
+    const r = reviews[current];
+    modalImage.src = r.src;
+    modalImage.alt = 'Отзыв — ' + r.name;
+    modalName.firstChild.textContent = r.name + ' ';
+    modalTag.textContent = r.tag;
+    modalCount.textContent = `${current+1} / ${total}`;
+  }
+  document.querySelectorAll('.review-tile').forEach(t=>{
+    t.addEventListener('click', ()=> openModal(parseInt(t.dataset.index)));
+  });
+  document.getElementById('modalClose').addEventListener('click', ()=> backdrop.classList.remove('open'));
+  backdrop.addEventListener('click', (e)=>{ if(e.target === backdrop) backdrop.classList.remove('open'); });
+  document.getElementById('modalPrev').addEventListener('click', ()=>{ current = current===0? total-1 : current-1; updateModal(); });
+  document.getElementById('modalNext').addEventListener('click', ()=>{ current = current===total-1? 0 : current+1; updateModal(); });
+  document.addEventListener('keydown', (e)=>{
+    if(!backdrop.classList.contains('open')) return;
+    if(e.key === 'Escape') backdrop.classList.remove('open');
+    if(e.key === 'ArrowLeft') document.getElementById('modalPrev').click();
+    if(e.key === 'ArrowRight') document.getElementById('modalNext').click();
+  });
+
+  // Diploma lightbox
+  const diplomaBackdrop = document.getElementById('diplomaBackdrop');
+  document.getElementById('diplomaOpen').addEventListener('click', ()=> diplomaBackdrop.classList.add('open'));
+  document.getElementById('diplomaClose').addEventListener('click', ()=> diplomaBackdrop.classList.remove('open'));
+  diplomaBackdrop.addEventListener('click', (e)=>{ if(e.target === diplomaBackdrop) diplomaBackdrop.classList.remove('open'); });
+  document.addEventListener('keydown', (e)=>{
+    if(diplomaBackdrop.classList.contains('open') && e.key === 'Escape') diplomaBackdrop.classList.remove('open');
+  });
+
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  }, {threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=> io.observe(el));
+
+  // Scroll progress curve
+  const progressPath = document.getElementById('curve-progress');
+  const dot = document.getElementById('curve-dot');
+  const fullPath = document.getElementById('curve-path');
+  const pathLength = fullPath.getTotalLength ? fullPath.getTotalLength() : 2000;
+  progressPath.style.strokeDasharray = pathLength;
+  progressPath.style.strokeDashoffset = pathLength;
+
+  function onScroll(){
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = Math.min(1, Math.max(0, scrollTop / docHeight));
+    const offset = pathLength * (1 - pct);
+    progressPath.style.strokeDashoffset = offset;
+    const pt = fullPath.getPointAtLength(pathLength * pct);
+    dot.setAttribute('cx', pt.x);
+    dot.setAttribute('cy', pt.y);
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', onScroll);
+  onScroll();
+</script>
+
+</body>
+</html>
